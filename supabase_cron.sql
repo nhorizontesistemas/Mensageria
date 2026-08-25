@@ -12,7 +12,7 @@ select cron.schedule(
   '*/5 * * * *',
   $$
   select net.http_get(
-    url := 'https://SEU-DOMINIO.vercel.app/cron/processar-fila/',
+    url := 'https://mensageria-cyan.vercel.app/cron/processar-fila/',
     headers := jsonb_build_object('Authorization', 'Bearer XRq3B8KjZoPej2_phDrxUjyfgCxdd1wPc7jICCgAE2Q')
   );
   $$
@@ -23,7 +23,7 @@ select cron.schedule(
   '*/5 * * * *',
   $$
   select net.http_get(
-    url := 'https://SEU-DOMINIO.vercel.app/cron/processar-importacoes/',
+    url := 'https://mensageria-cyan.vercel.app/cron/processar-importacoes/',
     headers := jsonb_build_object('Authorization', 'Bearer XRq3B8KjZoPej2_phDrxUjyfgCxdd1wPc7jICCgAE2Q')
   );
   $$
