@@ -6,8 +6,17 @@ from decouple import Csv, config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+
+# Vercel expõe a URL do deployment atual e a URL de produção estável nessas
+# env vars — inclui automaticamente pra não precisar atualizar ALLOWED_HOSTS
+# a cada novo domínio/deploy.
+for _vercel_host in (config('VERCEL_URL', default=''), config('VERCEL_PROJECT_PRODUCTION_URL', default='')):
+    if _vercel_host and _vercel_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_vercel_host)
+
+CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host not in ('localhost', '127.0.0.1')]
 
 # Token exigido no header/query dos endpoints de cron (proteção contra chamadas externas)
 CRON_SECRET = config('CRON_SECRET', default='dev-cron-secret')
