@@ -1,0 +1,34 @@
+{% extends "painel/base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'painel:contato_list' cliente.id %}">&larr; Contatos</a>
+<h1>{{ titulo }}</h1>
+
+<form method="post" class="stack">
+  {% csrf_token %}
+  <div class="row2">
+    <div class="field">
+      <label for="{{ form.nome.id_for_label }}">Nome</label>
+      {{ form.nome }}
+    </div>
+    <div class="field">
+      <label for="{{ form.telefone.id_for_label }}">Telefone</label>
+      {{ form.telefone }}
+      <p class="help">DDI+DDD+número, só dígitos (ex: 5511999998888).</p>
+      {{ form.telefone.errors }}
+    </div>
+  </div>
+  <div class="field">
+    <label for="{{ form.tags_texto.id_for_label }}">Tags</label>
+    {{ form.tags_texto }}
+    <p class="help">{{ form.tags_texto.help_text }}</p>
+  </div>
+  <div class="checkrow">
+    {{ form.ativo }}
+    <label for="{{ form.ativo.id_for_label }}" style="margin:0; text-transform:none; font-family:'Manrope'; font-weight:500; font-size:0.88rem; color:var(--ink);">Contato ativo</label>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn primary">Salvar</button>
+  </div>
+</form>
+{% endblock %}

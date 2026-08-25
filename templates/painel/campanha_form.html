@@ -1,0 +1,137 @@
+{% extends "painel/base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'painel:cliente_detail' cliente.id %}">&larr; {{ cliente.nome }}</a>
+<h1>{{ titulo }}</h1>
+<p class="sub">Define ritmo de envio, público e a sequência de mensagens desta campanha.</p>
+
+<style>
+  .msg-form {
+    border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px;
+    margin-bottom: 12px; display: grid; grid-template-columns: 80px 140px 1fr 1fr auto; gap: 12px; align-items: start;
+  }
+  .msg-form .field { margin: 0; }
+  .msg-del { align-self: center; }
+  .msg-del label { text-transform: none; font-family: "Manrope"; font-weight: 500; color: var(--danger); font-size: 0.8rem; display: flex; gap: 6px; align-items: center; }
+  @media (max-width: 860px) { .msg-form { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<form method="post" enctype="multipart/form-data" class="stack" style="max-width: 780px;">
+  {% csrf_token %}
+
+  <div class="field">
+    <label for="{{ form.nome.id_for_label }}">Nome da campanha</label>
+    {{ form.nome }}
+    {{ form.nome.errors }}
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label for="{{ form.status.id_for_label }}">Status</label>
+      {{ form.status }}
+    </div>
+    <div class="checkrow" style="align-self: end; padding-bottom: 10px;">
+      {{ form.round_robin }}
+      <label style="margin:0; text-transform:none; font-family:'Manrope'; font-weight:500; font-size:0.88rem; color:var(--ink);">Intercalar entre instâncias (round-robin)</label>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend>Instâncias vinculadas</legend>
+    <div class="checks">{{ form.instancias }}</div>
+    {% if not form.instancias.field.queryset.exists %}<p class="help">Nenhuma instância cadastrada para este cliente ainda.</p>{% endif %}
+  </fieldset>
+
+  <fieldset>
+    <legend>Segmentação do público</legend>
+    <div class="field">
+      <label for="{{ form.segmentacao_tipo.id_for_label }}">Tipo</label>
+      {{ form.segmentacao_tipo }}
+    </div>
+    <div class="row2" style="margin-top:14px;">
+      <div class="field">
+        <label>Por tag</label>
+        <div class="checks">{{ form.segmentacao_tags }}</div>
+      </div>
+      <div class="field">
+        <label for="{{ form.segmentacao_contatos.id_for_label }}">Lista específica</label>
+        {{ form.segmentacao_contatos }}
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Ritmo de envio (anti-bloqueio)</legend>
+    <div class="row3">
+      <div class="field"><label for="{{ form.limite_envios_dia.id_for_label }}">Limite/dia</label>{{ form.limite_envios_dia }}</div>
+      <div class="field"><label for="{{ form.tamanho_lote.id_for_label }}">Tamanho do lote</label>{{ form.tamanho_lote }}</div>
+      <div class="field"><label for="{{ form.pausa_entre_lotes_segundos.id_for_label }}">Pausa entre lotes (s)</label>{{ form.pausa_entre_lotes_segundos }}</div>
+    </div>
+    <div class="row3" style="margin-top:14px;">
+      <div class="field"><label for="{{ form.delay_min_segundos.id_for_label }}">Delay mín. (s)</label>{{ form.delay_min_segundos }}</div>
+      <div class="field"><label for="{{ form.delay_max_segundos.id_for_label }}">Delay máx. (s)</label>{{ form.delay_max_segundos }}</div>
+      <div class="field"><label for="{{ form.delay_sequencia_segundos.id_for_label }}">Delay entre itens (s)</label>{{ form.delay_sequencia_segundos }}</div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Agendamento</legend>
+    <div class="field"><label for="{{ form.data_inicio.id_for_label }}">Início</label>{{ form.data_inicio }}</div>
+    <div class="row2" style="margin-top:14px;">
+      <div class="field"><label for="{{ form.horario_inicio.id_for_label }}">Horário permitido — de</label>{{ form.horario_inicio }}</div>
+      <div class="field"><label for="{{ form.horario_fim.id_for_label }}">até</label>{{ form.horario_fim }}</div>
+    </div>
+    <div class="field" style="margin-top:14px;">
+      <label>Dias da semana</label>
+      <div class="checks" style="flex-direction:row; flex-wrap:wrap; gap:14px;">{{ form.dias_semana_permitidos }}</div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Mensagens (sequência enviada em ordem)</legend>
+    {{ formset.management_form }}
+    <div id="msg-forms">
+      {% for mform in formset %}
+      <div class="msg-form">
+        {{ mform.id }}
+        <div class="field"><label>Ordem</label>{{ mform.ordem }}</div>
+        <div class="field"><label>Tipo</label>{{ mform.tipo }}</div>
+        <div class="field"><label>Texto</label>{{ mform.texto }}</div>
+        <div class="field"><label>Arquivo</label>{{ mform.arquivo }}</div>
+        {% if mform.instance.pk %}<div class="msg-del"><label>{{ mform.DELETE }} excluir</label></div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <button type="button" class="btn sm" id="add-msg">+ Adicionar mensagem</button>
+  </fieldset>
+
+  <div class="form-actions">
+    <button type="submit" class="btn primary">Salvar campanha</button>
+  </div>
+</form>
+
+<template id="msg-empty-template">
+  <div class="msg-form">
+    <div class="field"><label>Ordem</label>{{ formset.empty_form.ordem }}</div>
+    <div class="field"><label>Tipo</label>{{ formset.empty_form.tipo }}</div>
+    <div class="field"><label>Texto</label>{{ formset.empty_form.texto }}</div>
+    <div class="field"><label>Arquivo</label>{{ formset.empty_form.arquivo }}</div>
+  </div>
+</template>
+
+<script>
+  (function () {
+    var totalForms = document.getElementById('id_mensagens-TOTAL_FORMS');
+    var container = document.getElementById('msg-forms');
+    var template = document.getElementById('msg-empty-template').innerHTML;
+    document.getElementById('add-msg').addEventListener('click', function () {
+      var idx = parseInt(totalForms.value, 10);
+      var html = template.replace(/__prefix__/g, idx);
+      var div = document.createElement('div');
+      div.innerHTML = html.trim();
+      container.appendChild(div.firstElementChild);
+      totalForms.value = idx + 1;
+    });
+  })();
+</script>
+{% endblock %}

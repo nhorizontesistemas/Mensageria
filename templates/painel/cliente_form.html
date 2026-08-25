@@ -1,0 +1,35 @@
+{% extends "painel/base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+{% if cliente %}<a class="back" href="{% url 'painel:cliente_detail' cliente.id %}">&larr; {{ cliente.nome }}</a>{% else %}<a class="back" href="{% url 'painel:dashboard' %}">&larr; Clientes</a>{% endif %}
+<h1>{{ titulo }}</h1>
+<p class="sub">Dados do cliente. Instâncias e campanhas ficam na página do cliente.</p>
+
+<form method="post" class="stack">
+  {% csrf_token %}
+  <div class="field">
+    <label for="{{ form.nome.id_for_label }}">Nome</label>
+    {{ form.nome }}
+    {{ form.nome.errors }}
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label for="{{ form.email_contato.id_for_label }}">E-mail de contato</label>
+      {{ form.email_contato }}
+      {{ form.email_contato.errors }}
+    </div>
+    <div class="field">
+      <label for="{{ form.telefone_contato.id_for_label }}">Telefone de contato</label>
+      {{ form.telefone_contato }}
+      {{ form.telefone_contato.errors }}
+    </div>
+  </div>
+  <div class="checkrow">
+    {{ form.ativo }}
+    <label for="{{ form.ativo.id_for_label }}" style="margin:0; text-transform:none; font-family:'Manrope'; font-weight:500; font-size:0.88rem; color:var(--ink);">Cliente ativo</label>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn primary">Salvar</button>
+  </div>
+</form>
+{% endblock %}

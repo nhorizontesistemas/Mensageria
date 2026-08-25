@@ -1,0 +1,57 @@
+{% extends "painel/base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'painel:cliente_detail' cliente.id %}">&larr; {{ cliente.nome }}</a>
+<h1>{{ titulo }}</h1>
+<p class="sub">Dados de conexão com a Z-API para esta instância.</p>
+
+<form method="post" class="stack">
+  {% csrf_token %}
+  <div class="row2">
+    <div class="field">
+      <label for="{{ form.apelido.id_for_label }}">Apelido</label>
+      {{ form.apelido }}
+      {{ form.apelido.errors }}
+    </div>
+    <div class="field">
+      <label for="{{ form.instance_id.id_for_label }}">Instance ID</label>
+      {{ form.instance_id }}
+      {{ form.instance_id.errors }}
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label for="{{ form.token.id_for_label }}">Token</label>
+      {{ form.token }}
+      {{ form.token.errors }}
+    </div>
+    <div class="field">
+      <label for="{{ form.client_token.id_for_label }}">Client-Token (opcional)</label>
+      {{ form.client_token }}
+      <p class="help">Token de segurança da conta Z-API, se configurado.</p>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend>Failover automático</legend>
+    <div class="row3">
+      <div class="field">
+        <label for="{{ form.janela_amostra.id_for_label }}">Janela de amostra</label>
+        {{ form.janela_amostra }}
+      </div>
+      <div class="field">
+        <label for="{{ form.limite_taxa_erro.id_for_label }}">Taxa de erro limite (0-1)</label>
+        {{ form.limite_taxa_erro }}
+      </div>
+      <div class="field">
+        <label for="{{ form.pausa_pos_failover_minutos.id_for_label }}">Pausa pós-failover (min)</label>
+        {{ form.pausa_pos_failover_minutos }}
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <button type="submit" class="btn primary">Salvar</button>
+  </div>
+</form>
+{% endblock %}

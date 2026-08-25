@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ cliente.nome }} — Painel de envios</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Newsreader:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #F6F8F5; --ink: #14201A; --ink-soft: #4B5A51;
+    --accent: #1F7A52; --accent-soft: #E1EFE5; --line: #D8E2DB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink); margin: 0;
+    font-family: "Newsreader", Georgia, serif;
+    padding: 48px 20px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 {
+    font-family: "Archivo", sans-serif; font-weight: 700;
+    font-size: 1.6rem; margin: 0 0 4px;
+  }
+  .sub { color: var(--ink-soft); margin: 0 0 32px; font-size: 0.95rem; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 36px; }
+  .stat {
+    background: #fff; border: 1px solid var(--line); border-radius: 8px;
+    padding: 18px; text-align: center;
+  }
+  .stat .n {
+    font-family: "IBM Plex Mono", monospace; font-size: 1.7rem;
+    font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+  .stat .l {
+    font-family: "Archivo", sans-serif; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft);
+  }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+  th { font-family: "Archivo", sans-serif; font-size: 0.72rem; text-transform: uppercase; color: var(--ink-soft); background: var(--accent-soft); }
+  td:nth-child(2), td:nth-child(3) { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>{{ cliente.nome }}</h1>
+    <p class="sub">Painel de acompanhamento — atualizado em tempo real</p>
+
+    <div class="stats">
+      <div class="stat"><div class="n">{{ total_hoje }}</div><div class="l">Enviadas hoje</div></div>
+      <div class="stat"><div class="n">{{ enviadas_hoje }}</div><div class="l">Entregues</div></div>
+      <div class="stat"><div class="n">{{ falhas_hoje }}</div><div class="l">Falhas</div></div>
+    </div>
+
+    {% if resumo_campanhas %}
+    <table>
+      <thead><tr><th>Campanha</th><th>Entregues</th><th>Falhas</th></tr></thead>
+      <tbody>
+        {% for c in resumo_campanhas %}
+        <tr><td>{{ c.nome }}</td><td>{{ c.enviadas }}</td><td>{{ c.falhas }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</body>
+</html>

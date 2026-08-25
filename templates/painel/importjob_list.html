@@ -1,0 +1,53 @@
+{% extends "painel/base.html" %}
+{% block title %}Importações — {{ cliente.nome }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'painel:contato_list' cliente.id %}">&larr; Contatos</a>
+
+<div class="page-head">
+  <div>
+    <h1>Importações</h1>
+    <p class="sub">Upload de CSV/Excel processado em segundo plano.</p>
+  </div>
+  <a class="btn primary" href="{% url 'painel:importjob_create' cliente.id %}">+ Nova importação</a>
+</div>
+
+{% if jobs %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Arquivo</th><th>Status</th><th>Analisados</th><th>Válidos</th><th>Duplicados</th><th>Inválidos</th><th>Relatórios</th><th></th></tr></thead>
+  <tbody>
+    {% for job in jobs %}
+    <tr>
+      <td>{{ job.arquivo.name|cut:"importacoes/origem/" }}</td>
+      <td>
+        {% if job.status == 'concluido' %}<span class="badge ok">Concluído</span>
+        {% elif job.status == 'processando' %}<span class="badge info">Processando ({{ job.total_processadas }}/{{ job.total_linhas }})</span>
+        {% elif job.status == 'erro' %}<span class="badge danger">Erro</span>
+        {% else %}<span class="badge neutral">Pendente</span>{% endif %}
+      </td>
+      <td class="num">{{ job.total_linhas }}</td>
+      <td class="num">{{ job.total_validos }}</td>
+      <td class="num">{{ job.total_duplicados }}</td>
+      <td class="num">{{ job.total_invalidos }}</td>
+      <td class="actions">
+        {% if job.status == 'concluido' %}
+        {% if job.relatorio_validos %}<a class="btn sm" href="{{ job.relatorio_validos.url }}">válidos</a>{% endif %}
+        {% if job.relatorio_duplicados %}<a class="btn sm" href="{{ job.relatorio_duplicados.url }}">duplicados</a>{% endif %}
+        {% if job.relatorio_invalidos %}<a class="btn sm" href="{{ job.relatorio_invalidos.url }}">inválidos</a>{% endif %}
+        {% if job.relatorio_erros %}<a class="btn sm" href="{{ job.relatorio_erros.url }}">erros</a>{% endif %}
+        {% endif %}
+      </td>
+      <td>
+        {% if job.status == 'pendente' %}
+        <form method="post" action="{% url 'painel:importjob_processar_agora' cliente.id job.id %}">{% csrf_token %}<button class="btn sm primary">Processar agora</button></form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Nenhuma importação ainda.</p>
+{% endif %}
+{% endblock %}

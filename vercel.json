@@ -1,0 +1,16 @@
+{
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": { "includeFiles": ["staticfiles/**", "templates/**"] }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.py" }
+  ],
+  "crons": [
+    { "path": "/cron/processar-fila/", "schedule": "*/5 * * * *" },
+    { "path": "/cron/processar-importacoes/", "schedule": "*/5 * * * *" }
+  ]
+}

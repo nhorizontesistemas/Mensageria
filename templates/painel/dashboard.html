@@ -1,0 +1,32 @@
+{% extends "painel/base.html" %}
+{% block title %}Clientes{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Clientes</h1>
+    <p class="sub">Selecione um cliente para ver campanhas, contatos e instâncias.</p>
+  </div>
+  <a class="btn primary" href="{% url 'painel:cliente_create' %}">+ Novo cliente</a>
+</div>
+
+{% if clientes %}
+<div class="grid">
+  {% for c in clientes %}
+  <a class="card" href="{% url 'painel:cliente_detail' c.obj.id %}">
+    <div class="nome">
+      {{ c.obj.nome }}
+      {% if not c.obj.ativo %}<span class="badge neutral">inativo</span>{% endif %}
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">{{ c.campanhas_ativas }}</div><div class="l">Ativas</div></div>
+      <div class="stat"><div class="n">{{ c.pendentes }}</div><div class="l">Pendentes</div></div>
+      <div class="stat"><div class="n">{{ c.processados_hoje }}</div><div class="l">Hoje</div></div>
+      <div class="stat"><div class="n">{{ c.instancias_total }}</div><div class="l">Instâncias</div></div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="empty">Nenhum cliente cadastrado ainda.</p>
+{% endif %}
+{% endblock %}

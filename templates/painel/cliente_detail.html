@@ -1,0 +1,89 @@
+{% extends "painel/base.html" %}
+{% block title %}{{ cliente.nome }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'painel:dashboard' %}">&larr; Clientes</a>
+
+<div class="page-head">
+  <div>
+    <h1>{{ cliente.nome }} {% if not cliente.ativo %}<span class="badge neutral">inativo</span>{% endif %}</h1>
+    <p class="sub">Link público: <code>/publico/{{ cliente.token_publico }}/</code> &middot; {{ total_contatos }} contato{{ total_contatos|pluralize }}</p>
+  </div>
+  <a class="btn" href="{% url 'painel:cliente_update' cliente.id %}">Editar cliente</a>
+</div>
+
+<div class="page-head">
+  <h2 style="margin:0;">Campanhas</h2>
+  <a class="btn primary sm" href="{% url 'painel:campanha_create' cliente.id %}">+ Nova campanha</a>
+</div>
+{% if campanhas %}
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Nome</th><th>Status</th><th>Pendentes</th><th>Hoje</th><th>Falhas hoje</th><th>Ações</th></tr>
+  </thead>
+  <tbody>
+    {% for c in campanhas %}
+    <tr>
+      <td><a href="{% url 'painel:campanha_update' cliente.id c.obj.id %}">{{ c.obj.nome }}</a></td>
+      <td>
+        {% if c.obj.status == 'ativa' %}<span class="badge ok">Ativa</span>
+        {% elif c.obj.status == 'pausada' %}<span class="badge warn">Pausada</span>
+        {% elif c.obj.status == 'cancelada' %}<span class="badge danger">Cancelada</span>
+        {% elif c.obj.status == 'concluida' %}<span class="badge neutral">Concluída</span>
+        {% else %}<span class="badge info">{{ c.obj.get_status_display }}</span>{% endif %}
+      </td>
+      <td class="num">{{ c.pendentes }}</td>
+      <td class="num">{{ c.processados_hoje }}</td>
+      <td class="num">{{ c.falhas_hoje }}</td>
+      <td class="actions">
+        {% if c.obj.status == 'ativa' %}
+        <form method="post" action="{% url 'painel:campanha_pausar' c.obj.id %}">{% csrf_token %}<button class="btn sm">Pausar</button></form>
+        {% elif c.obj.status == 'pausada' or c.obj.status == 'agendada' or c.obj.status == 'rascunho' %}
+        <form method="post" action="{% url 'painel:campanha_retomar' c.obj.id %}">{% csrf_token %}<button class="btn primary sm">Ativar</button></form>
+        {% endif %}
+        {% if c.obj.status == 'ativa' or c.obj.status == 'pausada' or c.obj.status == 'agendada' or c.obj.status == 'rascunho' %}
+        <form method="post" action="{% url 'painel:campanha_cancelar' c.obj.id %}" onsubmit="return confirm('Cancelar esta campanha?');">{% csrf_token %}<button class="btn sm danger">Cancelar</button></form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Nenhuma campanha cadastrada ainda.</p>
+{% endif %}
+
+<div class="page-head">
+  <h2 style="margin:0;">Instâncias</h2>
+  <a class="btn primary sm" href="{% url 'painel:instancia_create' cliente.id %}">+ Nova instância</a>
+</div>
+{% if instancias %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Apelido</th><th>Status</th><th>Pausada até</th><th>Ações</th></tr></thead>
+  <tbody>
+    {% for i in instancias %}
+    <tr>
+      <td>{{ i.apelido }}</td>
+      <td>
+        {% if i.status == 'conectada' %}<span class="badge ok">Conectada</span>
+        {% elif i.status == 'pausada' %}<span class="badge warn">Pausada (failover)</span>
+        {% elif i.status == 'banida' %}<span class="badge danger">Banida/erro</span>
+        {% else %}<span class="badge neutral">Desconectada</span>{% endif %}
+      </td>
+      <td>{{ i.pausada_ate|default:"—" }}</td>
+      <td class="actions">
+        <form method="post" action="{% url 'painel:instancia_testar_conexao' cliente.id i.id %}">{% csrf_token %}<button class="btn sm">Testar</button></form>
+        <a class="btn sm" href="{% url 'painel:instancia_update' cliente.id i.id %}">Editar</a>
+        <form method="post" action="{% url 'painel:instancia_delete' cliente.id i.id %}" onsubmit="return confirm('Remover esta instância?');">{% csrf_token %}<button class="btn sm danger">Remover</button></form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">Nenhuma instância vinculada ainda.</p>
+{% endif %}
+{% endblock %}

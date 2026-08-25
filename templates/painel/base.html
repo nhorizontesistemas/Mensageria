@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Painel{% endblock %} — Central de Disparos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #0A0F1A;
+    --bg-panel: #0D1424;
+    --bg-elevated: #131C30;
+    --bg-elevated-2: #1A263D;
+    --ink: #EAF0F7;
+    --ink-soft: #93A4BD;
+    --ink-faint: #56647C;
+    --accent: #22E3A8;
+    --accent-strong: #4FF0BE;
+    --accent-2: #3D8BFF;
+    --accent-soft: #10332A;
+    --accent-2-soft: #0F2340;
+    --line: #1D2840;
+    --line-strong: #2A3752;
+    --warn: #F5B84E;
+    --warn-soft: #3A2C10;
+    --danger: #FF6B6B;
+    --danger-soft: #3A1418;
+    --shadow: 0 8px 28px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg); color: var(--ink); margin: 0;
+    font-family: "Manrope", -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px; line-height: 1.5;
+  }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { color: var(--accent-strong); }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+
+  /* ---------- Shell / sidebar ---------- */
+  .shell { display: flex; min-height: 100vh; }
+
+  aside.side {
+    width: 232px; flex-shrink: 0; background: var(--bg-panel);
+    border-right: 1px solid var(--line); padding: 22px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 8px 22px; margin-bottom: 10px; border-bottom: 1px solid var(--line);
+  }
+  .brand .mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600; color: #06110D;
+  }
+  .brand .name { font-family: "Archivo", sans-serif; font-weight: 700; font-size: 0.98rem; color: var(--ink); line-height: 1.2; }
+  .brand .name small { display: block; font-family: "Manrope", sans-serif; font-weight: 500; font-size: 0.68rem; color: var(--ink-faint); }
+
+  nav.side-nav { display: flex; flex-direction: column; gap: 2px; }
+  nav.side-nav a {
+    display: flex; align-items: center; gap: 10px;
+    font-family: "Archivo", sans-serif; font-weight: 600; font-size: 0.86rem;
+    color: var(--ink-soft); padding: 9px 12px; border-radius: 8px;
+  }
+  nav.side-nav a:hover { background: var(--bg-elevated); color: var(--ink); }
+  nav.side-nav a.active { background: var(--accent-soft); color: var(--accent-strong); }
+  nav.side-nav .ic { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; width: 16px; text-align: center; }
+
+  .side-cliente {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line);
+  }
+  .side-cliente .label {
+    font-family: "Archivo", sans-serif; font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint);
+    padding: 0 12px; margin-bottom: 8px;
+  }
+
+  .side-foot { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); }
+  .side-foot .user { font-family: "Archivo", sans-serif; font-size: 0.82rem; color: var(--ink-soft); padding: 0 12px 8px; }
+  .side-foot form button {
+    width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+    font-family: "Archivo", sans-serif; font-weight: 600; font-size: 0.82rem;
+    color: var(--ink-faint); padding: 8px 12px; border-radius: 8px;
+  }
+  .side-foot form button:hover { background: var(--bg-elevated); color: var(--danger); }
+
+  main.content { flex: 1; min-width: 0; padding: 34px 40px 80px; max-width: 1120px; }
+  main.content-guest {
+    max-width: none; display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+  }
+
+  .messages { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .messages li {
+    font-family: "Archivo", sans-serif; font-size: 0.85rem; padding: 10px 14px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent-strong); border: 1px solid var(--line);
+  }
+  .messages li.error { background: var(--danger-soft); color: var(--danger); }
+
+  h1 { font-family: "Archivo", sans-serif; font-weight: 800; font-size: 1.5rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+  h2 { font-family: "Archivo", sans-serif; font-weight: 700; font-size: 1.02rem; margin: 34px 0 12px; }
+  h2:first-of-type { margin-top: 0; }
+  .sub { color: var(--ink-soft); margin: 0 0 28px; font-size: 0.92rem; }
+  .back { font-family: "Archivo", sans-serif; font-weight: 600; font-size: 0.82rem; display: inline-block; margin-bottom: 16px; color: var(--ink-soft); }
+  .back:hover { color: var(--accent-strong); }
+  .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+  /* ---------- Badges / pills ---------- */
+  .badge {
+    font-family: "Archivo", sans-serif; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 3px 10px; border-radius: 20px; display: inline-block; white-space: nowrap;
+  }
+  .badge.ok { background: var(--accent-soft); color: var(--accent-strong); }
+  .badge.info { background: var(--accent-2-soft); color: var(--accent-2); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.danger { background: var(--danger-soft); color: var(--danger); }
+  .badge.neutral { background: var(--bg-elevated-2); color: var(--ink-soft); }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    font-family: "Archivo", sans-serif; font-size: 0.82rem; font-weight: 700;
+    border: 1px solid var(--line-strong); background: var(--bg-elevated); color: var(--ink);
+    padding: 9px 16px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #06110D; }
+  .btn.primary:hover { filter: brightness(1.08); color: #06110D; }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn.sm { padding: 6px 11px; font-size: 0.76rem; }
+
+  /* ---------- Cards / grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px 22px; text-decoration: none; color: var(--ink); display: block;
+  }
+  .card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .card .nome { font-family: "Archivo", sans-serif; font-weight: 700; font-size: 1.02rem; margin-bottom: 14px; color: var(--ink); }
+  .card .stats { display: flex; gap: 18px; flex-wrap: wrap; }
+  .card .stat .n { font-family: "IBM Plex Mono", monospace; font-size: 1.1rem; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+  .card .stat .l { font-family: "Archivo", sans-serif; font-size: 0.65rem; text-transform: uppercase; color: var(--ink-faint); letter-spacing: 0.03em; }
+  .empty { color: var(--ink-soft); }
+
+  .panel { background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 12px; padding: 24px 26px; margin-bottom: 20px; }
+
+  /* ---------- Tables ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; background: var(--bg-elevated); min-width: 560px; }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); font-size: 0.87rem; vertical-align: middle; }
+  th { font-family: "Archivo", sans-serif; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); background: var(--bg-elevated-2); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.015); }
+  .num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .actions form { display: inline; }
+
+  /* ---------- Forms ---------- */
+  form.stack { display: flex; flex-direction: column; gap: 18px; max-width: 640px; }
+  .field label, fieldset legend {
+    display: block; font-family: "Archivo", sans-serif; font-size: 0.73rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    color: var(--ink-soft); margin-bottom: 7px;
+  }
+  .field .help { font-size: 0.78rem; color: var(--ink-faint); margin-top: 5px; }
+  .field input[type=text], .field input[type=email], .field input[type=password],
+  .field input[type=number], .field input[type=time], .field input[type=datetime-local],
+  .field select, .field textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong);
+    border-radius: 8px; background: var(--bg-elevated-2); color: var(--ink);
+    font-family: "Manrope", sans-serif; font-size: 0.92rem;
+  }
+  .field textarea { min-height: 90px; resize: vertical; }
+  .field input[type=file] {
+    width: 100%; padding: 10px 12px; border: 1px dashed var(--line-strong);
+    border-radius: 8px; background: var(--bg-elevated-2); color: var(--ink-soft);
+    font-family: "Manrope", sans-serif; font-size: 0.85rem;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 0; }
+  .checks { display: flex; flex-direction: column; gap: 6px; }
+  .checks ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .checks label { display: flex; align-items: center; gap: 8px; font-family: "Manrope"; font-weight: 500; font-size: 0.88rem; color: var(--ink); text-transform: none; letter-spacing: normal; }
+  .checkrow { display: flex; align-items: center; gap: 8px; }
+  .checkrow input { width: auto; }
+  input[type=checkbox], input[type=radio] { width: 16px; height: 16px; accent-color: var(--accent); }
+  .checks input[type=checkbox], .checks input[type=radio] { margin-right: 2px; }
+  .errorlist { list-style: none; margin: 6px 0 0; padding: 0; color: var(--danger); font-size: 0.8rem; }
+  .form-actions { display: flex; gap: 10px; padding-top: 6px; }
+  select[multiple] { min-height: 130px; }
+
+  @media (max-width: 860px) {
+    aside.side { display: none; }
+    main.content { padding: 24px 18px 60px; }
+    .row2, .row3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  {% if user.is_authenticated %}
+  <aside class="side">
+    <a class="brand" href="{% url 'painel:dashboard' %}">
+      <span class="mark">▲</span>
+      <span class="name">Central de Disparos<small>painel operacional</small></span>
+    </a>
+    <nav class="side-nav">
+      <a href="{% url 'painel:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <span class="ic">◆</span> Clientes
+      </a>
+    </nav>
+    {% if cliente %}
+    <div class="side-cliente">
+      <div class="label">{{ cliente.nome }}</div>
+      <nav class="side-nav">
+        <a href="{% url 'painel:cliente_detail' cliente.id %}" class="{% if request.resolver_match.url_name == 'cliente_detail' %}active{% endif %}"><span class="ic">▤</span> Visão geral</a>
+        <a href="{% url 'painel:contato_list' cliente.id %}" class="{% if request.resolver_match.url_name == 'contato_list' %}active{% endif %}"><span class="ic">◎</span> Contatos</a>
+        <a href="{% url 'painel:importjob_list' cliente.id %}" class="{% if request.resolver_match.url_name == 'importjob_list' %}active{% endif %}"><span class="ic">⇅</span> Importações</a>
+        <a href="{% url 'painel:campanha_create' cliente.id %}" class="{% if request.resolver_match.url_name == 'campanha_create' %}active{% endif %}"><span class="ic">+</span> Nova campanha</a>
+      </nav>
+    </div>
+    {% endif %}
+    <div class="side-foot">
+      <div class="user">{{ user.get_username }}</div>
+      <form method="post" action="{% url 'painel:logout' %}">
+        {% csrf_token %}
+        <button type="submit">Sair</button>
+      </form>
+    </div>
+  </aside>
+  {% endif %}
+  <main class="content{% if not user.is_authenticated %} content-guest{% endif %}">
+    {% if messages %}
+    <ul class="messages">
+      {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

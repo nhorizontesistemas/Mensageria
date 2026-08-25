@@ -1,0 +1,43 @@
+{% extends "painel/base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block content %}
+<style>
+  .login-card {
+    width: 100%; max-width: 380px; background: var(--bg-elevated);
+    border: 1px solid var(--line); border-radius: 14px; padding: 38px 34px;
+    box-shadow: var(--shadow);
+  }
+  .login-card .mark {
+    width: 40px; height: 40px; border-radius: 10px; margin-bottom: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: "IBM Plex Mono", monospace; font-weight: 700; color: #06110D;
+  }
+  .login-card h1 { font-size: 1.25rem; margin-bottom: 4px; }
+  .login-card .sub { font-size: 0.86rem; margin-bottom: 26px; }
+  .login-card .btn.primary { width: 100%; padding: 11px; font-size: 0.9rem; justify-content: center; }
+</style>
+<div class="login-card">
+  <div class="mark">▲</div>
+  <h1>Central de Disparos</h1>
+  <p class="sub">Acesso interno — equipe operacional</p>
+
+  {% if form.non_field_errors %}
+  <ul class="messages"><li class="error">{% for error in form.non_field_errors %}{{ error }}{% endfor %}</li></ul>
+  {% endif %}
+
+  <form method="post" class="stack">
+    {% csrf_token %}
+    <div class="field">
+      <label for="id_username">Usuário</label>
+      <input type="text" name="username" id="id_username" autofocus required>
+    </div>
+    <div class="field">
+      <label for="id_password">Senha</label>
+      <input type="password" name="password" id="id_password" required>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn primary">Entrar</button>
+  </form>
+</div>
+{% endblock %}
