@@ -231,6 +231,9 @@
     {% endif %}
     <div class="side-foot">
       <div class="user">{{ user.get_username }}</div>
+      <nav class="side-nav">
+        <a href="{% url 'painel:password_change' %}" class="{% if request.resolver_match.url_name == 'password_change' %}active{% endif %}"><span class="ic">•</span> Trocar senha</a>
+      </nav>
       <form method="post" action="{% url 'painel:logout' %}">
         {% csrf_token %}
         <button type="submit">Sair</button>

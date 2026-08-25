@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -26,6 +27,16 @@ def handler_404(request, exception=None):
     if request.user.is_authenticated:
         return redirect('painel:dashboard')
     return redirect('painel:login')
+
+
+class PainelPasswordChangeView(PasswordChangeView):
+    template_name = 'painel/password_change.html'
+    success_url = reverse_lazy('painel:dashboard')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Senha alterada com sucesso.')
+        return response
 
 
 # ---------- Dashboard ----------
