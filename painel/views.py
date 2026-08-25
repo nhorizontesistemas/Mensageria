@@ -22,6 +22,12 @@ class PainelLoginView(LoginView):
     redirect_authenticated_user = True
 
 
+def handler_404(request, exception=None):
+    if request.user.is_authenticated:
+        return redirect('painel:dashboard')
+    return redirect('painel:login')
+
+
 # ---------- Dashboard ----------
 
 @login_required
